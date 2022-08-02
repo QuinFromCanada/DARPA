@@ -60,23 +60,19 @@ display.show(main)
 
 # ====== LABELS & shapes
 
+# Nav Ring
+navRingCircle = Circle(120, 120, 120, fill=0x000000)
+main.append(navRingCircle)
+mainFaceCircle = Circle(120, 120, 98, fill=0x101010, outline=0x262626)
+main.append(mainFaceCircle)
+
 # Nav Pointer
-line = Line(120, 24, 120, 216, color=0xFF0000)
-main.append(line)
-circle = Circle(120, 54, 18, fill=0x000000, outline=0xFF0000)
-main.append(circle)
+navPointerCircle = Circle(120, 54, 8, fill=0xFF0000, outline=0xA0A0A0)
+main.append(navPointerCircle)
 
 # Blanking Center
-circle = Circle(120, 120, 30, fill=0x000000, outline=0x000000)
-main.append(circle)
-
-
-# DISTANCE LABEL
-lblDISTANCE = label.Label(font=terminalio.FONT, text="8"*4, color=0xFF0000, scale=2)
-lblDISTANCE.anchor_point = (0.5, 0.5)
-lblDISTANCE.anchored_position = (121, 53)
-main.append(lblDISTANCE)
-
+blankingCenterCircle = Circle(120, 120, 36, fill=0x000000, outline=0x000000)
+main.append(blankingCenterCircle)
 
 # NORTH LABEL
 lblNORTH = label.Label(font=terminalio.FONT, text="N", color=0xFF0000, scale=2)
@@ -105,8 +101,16 @@ main.append(lblSOUTH)
 # SPEED LABEL
 lblSPEED = label.Label(font=terminalio.FONT, text="00", color=0xFF0000, scale=4)
 lblSPEED.anchor_point = (0.5, 0.5)
-lblSPEED.anchored_position = (120, 120)
+lblSPEED.anchored_position = (120, 104)
 main.append(lblSPEED)
+
+# DISTANCE LABEL
+lblDISTANCE = label.Label(font=terminalio.FONT, text="8"*4, color=0xFF0000, scale=2)
+lblDISTANCE.anchor_point = (0.5, 0.5)
+lblDISTANCE.anchored_position = (120, 136)
+main.append(lblDISTANCE)
+
+
 
 # TIME LABEL
 #lblTIME = label.Label(font=terminalio.FONT, text="00:00", color=0x0000FF, scale=2)
@@ -114,35 +118,6 @@ main.append(lblSPEED)
 #lblTIME.anchored_position = (120, 155)
 #main.append(lblTIME)
 
-
-# Main loop GPS update every second.
-last_print = time.monotonic()
-northDeg = 0;
-
-
-### --- Move compass indicator around the outside
-def compass(northDeg):
-    radiansN = math.radians(northDeg-90)
-    northX = (120 + 110 * math.cos(radiansN))
-    northY = (120 + 110 * math.sin(radiansN))
-
-    radiansE = math.radians(northDeg)
-    eastX = (120 + 110 * math.cos(radiansE))
-    eastY = (120 + 110 * math.sin(radiansE))
-
-    radiansS = math.radians(northDeg+90)
-    southX = (120 + 110 * math.cos(radiansS))
-    southY = (120 + 110 * math.sin(radiansS))
-
-    radiansW = math.radians(northDeg+180)
-    westX = (120 + 110 * math.cos(radiansW))
-    westY = (120 + 110 * math.sin(radiansW))
-
-    #print("Deg:{},X:{},Y:{}".format(northDeg, int(northX),int(northY)))  #math test output
-    lblNORTH.anchored_position = (northX, northY)
-    lblEAST.anchored_position = (eastX, eastY)
-    lblSOUTH.anchored_position = (southX, southY)
-    lblWEST.anchored_position = (westX, westY)
 
 
 # Print GPS info, test script
@@ -177,6 +152,48 @@ def GPSdataPrint(void):
     if gps.track_angle_deg is not None:
         print("Track angle: {} degrees".format(gps.track_angle_deg))
 
+
+
+### --- Move compass indicator around the outside
+def compass(northDeg):
+    radiansN = math.radians(northDeg-90)
+    northX = (120 + 110 * math.cos(radiansN))
+    northY = (120 + 110 * math.sin(radiansN))
+
+    radiansE = math.radians(northDeg)
+    eastX = (120 + 110 * math.cos(radiansE))
+    eastY = (120 + 110 * math.sin(radiansE))
+
+    radiansS = math.radians(northDeg+90)
+    southX = (120 + 110 * math.cos(radiansS))
+    southY = (120 + 110 * math.sin(radiansS))
+
+    radiansW = math.radians(northDeg+180)
+    westX = (120 + 110 * math.cos(radiansW))
+    westY = (120 + 110 * math.sin(radiansW))
+
+    #print("Deg:{},X:{},Y:{}".format(northDeg, int(northX),int(northY)))  #math test output
+    lblNORTH.anchored_position = (northX, northY)
+    lblEAST.anchored_position = (eastX, eastY)
+    lblSOUTH.anchored_position = (southX, southY)
+    lblWEST.anchored_position = (westX, westY)
+
+
+
+### --- Move heading indicator
+def heading(headingDeg):
+
+
+    # Updates the heading display circle
+    radiansHeading = math.radians(headingDeg-90)
+    headingX = (110 + 76 * math.cos(radiansHeading)) #Not sure why i have to use 110 and not 120
+    headingY = (110 + 76 * math.sin(radiansHeading)) #Not sure why i have to use 110 and not 120
+
+    navPointerCircle.x = int(headingX)
+    navPointerCircle.y = int(headingY)
+
+
+
 # ‘haversine’ formula for finding distance between 2 points
 def CalcDistance(Lat1, Long1, Lat2, Long2):
     R = 6372.8 # this is in km.  For miles use 3959.87433
@@ -189,12 +206,31 @@ def CalcDistance(Lat1, Long1, Lat2, Long2):
     a = math.sin(dLat/2)**2 + math.cos(lat1)*math.cos(lat2)*math.sin(dLon/2)**2
     c = 2*math.asin(math.sqrt(a))
 
-    lblDISTANCE.text = ("{:3}".format(R*c))
-    #return R * c
-    print ("{}, {}".format(Lat1, Long1))
-    print ("{}, {}".format(Lat2, Long2))
-    print(R * c)
+    calculatedDistance = R*c
+    print(calculatedDistance)
 
+    # if the distance is more then 1000m show K for KM, if its under 1k show distance in meters
+    if calculatedDistance >= 1000:
+        calculatedDistance = "{}K".format(int(calculatedDistance/1000))
+        lblDISTANCE.color=0xFF0000
+    elif calculatedDistance < 1:
+        calculatedDistance = "{}m".format(int(calculatedDistance*1000))
+        lblDISTANCE.color = 0x00FF00
+    else:
+        calculatedDistance = "{}".format(int(calculatedDistance))
+        lblDISTANCE.color=0xFF0000
+
+    print(calculatedDistance)
+    lblDISTANCE.text = calculatedDistance
+
+
+
+### -------- MAIN LOOP ---------------
+
+
+# Main loop GPS update every second.
+last_print = time.monotonic()
+headingDeg = 0
 
 # Main loop
 while True:
@@ -211,23 +247,29 @@ while True:
             print("# satellites: {}".format(gps.satellites))
             continue
         # We have a fix! (gps.has_fix is true)
+        
         lat1 = (gps.latitude)
-        long1 = abs(gps.longitude) ## ABS used to fix East and west issues
+        long1 = (gps.longitude) 
 
         ### --- Distance Test Points, use https://www.movable-type.co.uk/scripts/latlong.html to verify
         ## - CN tower test co-ordinence
         #lat2 = 33.8568
-        #long2 = 79.3871
+        #long2 = -79.3871
 
         ## - Sydney Opera House test co-ordinence
-        lat2 = -33.8568
-        long2 = -151.2153
-
+        #lat2 = -33.8568
+        #long2 = -151.2153
 
 
         if gps.track_angle_deg is not None:
             compass(gps.track_angle_deg)
 
         CalcDistance(lat1, long1, lat2, long2)
+
+        headingDeg += 10
+        if headingDeg >= 359:
+            headingDeg = 0
+        heading(headingDeg)
+        
 
 
