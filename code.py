@@ -181,11 +181,20 @@ def compass(northDeg):
 
 
 ### --- Move heading indicator
-def heading(headingDeg):
+def CalcHeading(lat1, long1, lat2, long2, NorthAngle):
+    #const y = Math.sin(λ2-λ1) * Math.cos(φ2);
+    y = math.sin(long2-long1) * math.cos(lat2)
+    #const x = Math.cos(φ1)*Math.sin(φ2) - Math.sin(φ1)*Math.cos(φ2)*Math.cos(λ2-λ1);
+    x = math.cos(lat1)*math.sin(lat2) - math.sin(lat1)*math.cos(lat2)*math.cos(long2-long1)
+    #const θ = Math.atan2(y, x);
+    angle = math.atan2(y, x)
+    #const brng = (θ*180/Math.PI + 360) % 360; // in degrees
+    bearing = (angle*180/math.pi + 360) % 360
+    print("bearing: {}".format(bearing))
 
 
     # Updates the heading display circle
-    radiansHeading = math.radians(headingDeg-90)
+    radiansHeading = math.radians(bearing-90+NorthAngle)
     headingX = (110 + 76 * math.cos(radiansHeading)) #Not sure why i have to use 110 and not 120
     headingY = (110 + 76 * math.sin(radiansHeading)) #Not sure why i have to use 110 and not 120
 
@@ -199,7 +208,7 @@ def CalcDistance(Lat1, Long1, Lat2, Long2):
     R = 6372.8 # this is in km.  For miles use 3959.87433
 
     dLat = math.radians(Lat2 - Lat1)
-    dLon = math.radians((Long1 - Long2))
+    dLon = math.radians((Long2 - Long1))
     lat1 = math.radians(Lat1)
     lat2 = math.radians(Lat2)
 
@@ -207,7 +216,7 @@ def CalcDistance(Lat1, Long1, Lat2, Long2):
     c = 2*math.asin(math.sqrt(a))
 
     calculatedDistance = R*c
-    print(calculatedDistance)
+    print("distance: {}" .format(calculatedDistance))
 
     # if the distance is more then 1000m show K for KM, if its under 1k show distance in meters
     if calculatedDistance >= 1000:
@@ -220,7 +229,6 @@ def CalcDistance(Lat1, Long1, Lat2, Long2):
         calculatedDistance = "{}".format(int(calculatedDistance))
         lblDISTANCE.color=0xFF0000
 
-    print(calculatedDistance)
     lblDISTANCE.text = calculatedDistance
 
 
@@ -247,29 +255,29 @@ while True:
             print("# satellites: {}".format(gps.satellites))
             continue
         # We have a fix! (gps.has_fix is true)
-        
+
         lat1 = (gps.latitude)
-        long1 = (gps.longitude) 
+        long1 = (gps.longitude)
 
         ### --- Distance Test Points, use https://www.movable-type.co.uk/scripts/latlong.html to verify
         ## - CN tower test co-ordinence
-        #lat2 = 33.8568
-        #long2 = -79.3871
+        lat2 = 43.6426
+        long2 = -79.3871
 
         ## - Sydney Opera House test co-ordinence
         #lat2 = -33.8568
         #long2 = -151.2153
 
-
+        print("-----")
         if gps.track_angle_deg is not None:
-            compass(gps.track_angle_deg)
+            NorthAngle = int(gps.track_angle_deg)
+            compass(NorthAngle)
+        else:
+            NorthAngle = 0
+        print("North A:{}".format(NorthAngle))
 
         CalcDistance(lat1, long1, lat2, long2)
+        CalcHeading(lat1, long1, lat2, long2, NorthAngle)
 
-        headingDeg += 10
-        if headingDeg >= 359:
-            headingDeg = 0
-        heading(headingDeg)
-        
 
 
