@@ -85,6 +85,12 @@ lblSPEED.anchor_point = (0.5, 0.5)
 lblSPEED.anchored_position = (120, 120)
 main.append(lblSPEED)
 
+# DISTANCE LABEL
+lblDISTANCE = label.Label(font=terminalio.FONT, text="8"*4, color=0xFF0000, scale=2)
+lblDISTANCE.anchor_point = (0.5, 0.5)
+lblDISTANCE.anchored_position = (120, 136)
+main.append(lblDISTANCE)
+
 # TIME LABEL
 #lblTIME = label.Label(font=terminalio.FONT, text="00:00", color=0x0000FF, scale=2)
 #lblTIME.anchor_point = (0.5, 0.5)
