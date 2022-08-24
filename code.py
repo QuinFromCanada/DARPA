@@ -40,22 +40,19 @@ display.show(main)
 
 # ====== LABELS & shapes
 
+# Nav Ring
+navRingCircle = Circle(120, 120, 120, fill=0x000000)
+main.append(navRingCircle)
+mainFaceCircle = Circle(120, 120, 98, fill=0x101010, outline=0x262626)
+main.append(mainFaceCircle)
+
 # Nav Pointer
-line = Line(120, 24, 120, 216, color=0xFF0000)
-main.append(line)
-circle = Circle(120, 54, 18, fill=0x000000, outline=0xFF0000)
-main.append(circle)
+navPointerCircle = Circle(120, 54, 8, fill=0xFF0000, outline=0xA0A0A0)
+main.append(navPointerCircle)
 
 # Blanking Center
-circle = Circle(120, 120, 30, fill=0x000000, outline=0x000000)
-main.append(circle)
-
-
-# DISTANCE LABEL
-lblDISTANCE = label.Label(font=terminalio.FONT, text="8"*2, color=0xFF0000, scale=2)
-lblDISTANCE.anchor_point = (0.5, 0.5)
-lblDISTANCE.anchored_position = (121, 53)
-main.append(lblDISTANCE)
+blankingCenterCircle = Circle(120, 120, 36, fill=0x000000, outline=0x000000)
+main.append(blankingCenterCircle)
 
 
 # NORTH LABEL
